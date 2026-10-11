@@ -1,865 +1,681 @@
-<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Hero - 多重宇宙大冒險</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .arcade-font {
-            font-family: 'Press Start 2P', monospace;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-        }
-        .floating {
-            animation: float 2s ease-in-out infinite;
-        }
-        
-        /* Wukong Flame Glow Keyframe */
-        @keyframes wukongGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.7)); }
-            50% { filter: drop-shadow(0 0 18px rgba(251, 191, 36, 1)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.9)); }
-        }
-        .wukong-glow {
-            animation: wukongGlow 1.2s infinite ease-in-out;
-        }
 
-        /* Sailor Moon Magic Glow Keyframe */
-        @keyframes magicGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(244, 114, 182, 0.9)) drop-shadow(0 0 16px rgba(192, 132, 252, 0.7)); }
-            50% { filter: drop-shadow(0 0 18px rgba(251, 207, 232, 1)) drop-shadow(0 0 25px rgba(244, 114, 182, 1)); }
-        }
-        .magic-glow {
-            animation: magicGlow 1.5s infinite ease-in-out;
-        }
+<meta name="robots" content="noindex, nofollow, noai, noimageai">
+<meta name="googlebot" content="noindex, nofollow, noai">
+<meta name="GPTBot" content="noindex, nofollow">
+<meta name="ChatGPT-User" content="noindex, nofollow">
+<meta name="ClaudeBot" content="noindex, nofollow">
+<meta name="PerplexityBot" content="noindex, nofollow">
 
-        /* Alien Matrix Neon Glow Keyframe */
-        @keyframes alienGlow {
-            0%, 100% { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.9)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.7)); }
-            50% { filter: drop-shadow(0 0 18px rgba(52, 211, 153, 1)) drop-shadow(0 0 25px rgba(16, 185, 129, 1)); }
-        }
-        .alien-glow {
-            animation: alienGlow 1.4s infinite ease-in-out;
-        }
 
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
-            50% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.9); }
-        }
-        .glow-btn {
-            animation: pulseGlow 2s infinite;
-        }
-    </style>
+<script>
+  // 禁用滑鼠右鍵
+  document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+  });
+
+  // 禁用快捷鍵 (F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+S)
+  document.addEventListener('keydown', function(e) {
+    if (
+      e.key === 'F12' || 
+      (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j')) ||
+      (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's'))
+    ) {
+      e.preventDefault();
+      return false;
+    }
+  });
+</script>
+    
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Flappy Hero - 英雄大冒險</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@700;900&display=swap');
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .pixel-font {
+      font-family: 'Press Start 2P', cursive, sans-serif;
+    }
+
+    /* 光暈與粒子特效 */
+    @keyframes wukongGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px #ff9900) drop-shadow(0 0 20px #ff3300); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 18px #ffcc00) drop-shadow(0 0 30px #ff6600); transform: scale(1.05); }
+    }
+
+    @keyframes magicGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px #ff66cc) drop-shadow(0 0 20px #ff99ff); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 18px #ff3399) drop-shadow(0 0 30px #ffffff); transform: scale(1.05); }
+    }
+
+    @keyframes alienGlow {
+      0%, 100% { filter: drop-shadow(0 0 10px #00ffcc) drop-shadow(0 0 20px #00ff66); transform: scale(1); }
+      50% { filter: drop-shadow(0 0 18px #33ffff) drop-shadow(0 0 30px #66ff33); transform: scale(1.05); }
+    }
+
+    .glow-wukong { animation: wukongGlow 1.2s infinite ease-in-out; }
+    .glow-sailor { animation: magicGlow 1.2s infinite ease-in-out; }
+    .glow-alien { animation: alienGlow 1.2s infinite ease-in-out; }
+
+    /* 隱藏滾動條 */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center overflow-hidden m-0 p-0">
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden select-none">
 
-    <div id="game-container" class="relative w-full max-w-md h-[700px] bg-slate-900 shadow-2xl overflow-hidden flex flex-col justify-between border-4 border-slate-700 sm:rounded-2xl">
+  <!-- 遊戲主容器 -->
+  <div class="relative w-full max-w-md h-[680px] bg-black rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-700 flex flex-col justify-between">
+    
+    <!-- Canvas 遊戲畫布 -->
+    <canvas id="gameCanvas" width="380" height="680" class="absolute inset-0 w-full h-full z-0"></canvas>
 
-        <!-- Character Selection Screen -->
-        <div id="screen-select" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center p-6 text-center">
-            <h1 class="arcade-font text-2xl md:text-3xl text-amber-400 mb-2 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">FLAPPY HERO</h1>
-            <p class="text-slate-400 text-sm mb-6">選擇你的英雄，挑戰無盡宇宙！</p>
-            
-            <div class="grid grid-cols-1 gap-4 w-full max-w-xs mb-8">
-                <!-- Wukong -->
-                <button onclick="selectCharacter('wukong')" class="flex items-center p-4 bg-amber-950/60 border-2 border-amber-500 rounded-xl hover:bg-amber-900/80 transition transform hover:scale-105 group text-left">
-                    <div class="text-3xl mr-4 bg-amber-900/50 p-2 rounded-lg group-hover:rotate-12 transition wukong-glow">🔥🐒</div>
-                    <div>
-                        <div class="font-bold text-amber-300 text-lg flex items-center gap-1">齊天大聖 孫悟空 <span class="text-xs">🔥</span></div>
-                        <div class="text-xs text-amber-400/80">黃金烈焰光環 / 絕美沙漠背景</div>
-                    </div>
-                </button>
+    <!-- UI 層：角色選擇頁面 -->
+    <div id="charSelectMenu" class="relative z-10 flex flex-col items-center justify-between h-full p-6 bg-slate-950/80 backdrop-blur-md transition-all duration-300">
+      <div class="text-center mt-4">
+        <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-cyan-400 drop-shadow-md">
+          FLAPPY HEROES
+        </h1>
+        <p class="text-xs text-slate-300 mt-2 tracking-widest uppercase">選擇你的英雄開啟冒險</p>
+      </div>
 
-                <!-- Sailor Moon -->
-                <button onclick="selectCharacter('sailormoon')" class="flex items-center p-4 bg-pink-950/60 border-2 border-pink-500 rounded-xl hover:bg-pink-900/80 transition transform hover:scale-105 group text-left">
-                    <div class="text-3xl mr-4 bg-pink-900/50 p-2 rounded-lg group-hover:-rotate-12 transition magic-glow">💖✨</div>
-                    <div>
-                        <div class="font-bold text-pink-300 text-lg flex items-center gap-1">美少女戰士 <span class="text-xs">✨</span></div>
-                        <div class="text-xs text-pink-400/80">夢幻魔法愛心光環 / 璀璨夜空</div>
-                    </div>
-                </button>
-
-                <!-- Alien -->
-                <button onclick="selectCharacter('alien')" class="flex items-center p-4 bg-emerald-950/60 border-2 border-emerald-500 rounded-xl hover:bg-emerald-900/80 transition transform hover:scale-105 group text-left">
-                    <div class="text-3xl mr-4 bg-emerald-900/50 p-2 rounded-lg group-hover:scale-110 transition alien-glow">👽🛸</div>
-                    <div>
-                        <div class="font-bold text-emerald-300 text-lg flex items-center gap-1">星際外星人 <span class="text-xs">💫</span></div>
-                        <div class="text-xs text-emerald-400/80">螢光矩陣脈衝 / 浩瀚星空背景</div>
-                    </div>
-                </button>
+      <!-- 角色卡片列表 -->
+      <div class="w-full space-y-3 my-auto">
+        
+        <!-- 孫悟空 -->
+        <button onclick="selectCharacter('wukong')" class="group relative w-full p-3.5 bg-gradient-to-r from-amber-950/80 to-slate-900/80 border-2 border-amber-500/50 hover:border-amber-400 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+          <div class="text-4xl glow-wukong group-hover:scale-110 transition-transform">🐒</div>
+          <div class="text-left flex-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-amber-300 text-lg">孫悟空</span>
+              <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">黃金烈焰</span>
             </div>
-            
-            <button onclick="showLeaderboardFromMenu()" class="text-sm text-slate-400 underline hover:text-white transition">查看全球排行榜</button>
-        </div>
+            <p class="text-xs text-amber-200/70 mt-0.5">背景：金黃古遺跡沙漠</p>
+          </div>
+        </button>
 
-        <!-- Canvas Game Screen -->
-        <div id="screen-game" class="relative w-full h-full hidden">
-            <canvas id="gameCanvas" class="w-full h-full block cursor-pointer"></canvas>
-            
-            <div class="absolute top-4 left-0 right-0 flex justify-between items-center px-6 pointer-events-none z-10">
-                <div class="arcade-font text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" id="live-score">0</div>
-                <button onclick="togglePause()" class="pointer-events-auto bg-slate-800/80 hover:bg-slate-700 text-white px-3 py-1 rounded-lg text-sm border border-slate-600">暫停</button>
+        <!-- 美少女戰士 -->
+        <button onclick="selectCharacter('sailor')" class="group relative w-full p-3.5 bg-gradient-to-r from-pink-950/80 to-slate-900/80 border-2 border-pink-500/50 hover:border-pink-400 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+          <div class="text-4xl glow-sailor group-hover:scale-110 transition-transform">💖</div>
+          <div class="text-left flex-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-pink-300 text-lg">美少女戰士</span>
+              <span class="text-[10px] bg-pink-500/20 text-pink-300 px-2 py-0.5 rounded-full border border-pink-500/30">粉紅愛心</span>
             </div>
+            <p class="text-xs text-pink-200/70 mt-0.5">背景：夢幻繁華夜都市</p>
+          </div>
+        </button>
 
-            <div id="tap-hint" class="absolute inset-x-0 bottom-20 flex justify-center pointer-events-none z-10 transition-opacity duration-300">
-                <div class="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm arcade-font floating">
-                    點擊螢幕 / 空白鍵 飛行
-                </div>
+        <!-- 外星人 -->
+        <button onclick="selectCharacter('alien')" class="group relative w-full p-3.5 bg-gradient-to-r from-cyan-950/80 to-slate-900/80 border-2 border-cyan-500/50 hover:border-cyan-400 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
+          <div class="text-4xl glow-alien group-hover:scale-110 transition-transform">👽</div>
+          <div class="text-left flex-1">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-cyan-300 text-lg">外星人</span>
+              <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">霓虹星能</span>
             </div>
-        </div>
+            <p class="text-xs text-cyan-200/70 mt-0.5">背景：浩瀚璀璨深太空</p>
+          </div>
+        </button>
 
-        <!-- Game Over Screen -->
-        <div id="screen-gameover" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-6 text-center">
-            <h2 class="arcade-font text-3xl text-rose-500 mb-1">遊戲結束</h2>
-            <p class="text-slate-400 text-xs mb-4">英雄長眠於此，記錄你的名字吧！</p>
-            
-            <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl w-full max-w-xs mb-5 shadow-2xl flex flex-col items-center">
-                <div class="text-slate-400 text-xs mb-1">最終得分</div>
-                <div id="final-score" class="arcade-font text-4xl text-amber-400 mb-4">0</div>
-                
-                <div id="score-submit-box" class="w-full flex flex-col items-center">
-                    <label class="block text-xs text-slate-300 mb-2 font-medium">輸入英雄大名 (最多 10 個字元)</label>
-                    
-                    <div class="relative w-full mb-3">
-                        <input type="text" id="player-name" maxlength="10" placeholder="輸入名稱" oninput="updateCharCount()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-center font-bold focus:outline-none focus:border-amber-500 transition shadow-inner">
-                        <span id="char-count" class="absolute right-3 top-2.5 text-xs text-slate-500 pointer-events-none">0/10</span>
-                    </div>
+      </div>
 
-                    <button onclick="submitScore()" class="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-extrabold py-2.5 rounded-xl transition shadow-lg transform active:scale-98">
-                        確定送出
-                    </button>
-
-                    <p id="error-msg" class="text-rose-400 text-xs mt-2 hidden">請輸入 1 至 10 個字元！</p>
-                </div>
-
-                <div id="score-submitted-msg" class="hidden text-emerald-400 font-bold text-sm py-2">
-                    ✓ 紀錄已成功存入排行榜！
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-2.5 w-full max-w-xs">
-                <button onclick="restartGame()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition glow-btn">再玩一次</button>
-                <button onclick="returnToMenu()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">返回主選單</button>
-            </div>
-        </div>
-
-        <!-- Leaderboard Screen -->
-        <div id="screen-leaderboard" class="absolute inset-0 bg-slate-950/95 z-40 hidden flex flex-col p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="arcade-font text-xl text-amber-400">英雄排行榜</h2>
-                <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-white text-xl font-bold px-2">✕</button>
-            </div>
-            
-            <div class="flex-1 overflow-y-auto space-y-3 mb-6" id="leaderboard-list">
-                <!-- Dynamically populated leaderboard items -->
-            </div>
-
-            <button onclick="closeLeaderboard()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">關閉</button>
-        </div>
-
-        <!-- Pause Screen -->
-        <div id="screen-pause" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 hidden flex flex-col items-center justify-center p-6 text-center">
-            <h2 class="arcade-font text-2xl text-white mb-6">遊戲暫停</h2>
-            <div class="flex flex-col gap-3 w-full max-w-xs">
-                <button onclick="togglePause()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition">繼續遊戲</button>
-                <button onclick="returnToMenu()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">放棄並返回主選單</button>
-            </div>
-        </div>
-
+      <!-- 排行榜按鈕 -->
+      <button onclick="openLeaderboard()" class="w-full py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-600 flex items-center justify-center gap-2 transition-all">
+        <span>🏆</span> 查看全球英雄排行榜
+      </button>
     </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- UI 層：遊戲中HUD -->
+    <div id="gameHUD" class="relative z-10 hidden p-6 flex justify-between items-start pointer-events-none">
+      <div id="scoreDisplay" class="pixel-font text-4xl text-white drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">0</div>
+      <button id="soundBtn" onclick="toggleSound()" class="pointer-events-auto p-2 bg-slate-900/60 backdrop-blur border border-white/20 rounded-full text-xl hover:bg-slate-800 transition">🔊</button>
+    </div>
 
-        let currentScreen = 'select'; // select, game, gameover, pause, leaderboard
-        let selectedChar = 'wukong'; // wukong, sailormoon, alien
-        let score = 0;
-        let isPaused = false;
-        let gameOver = false;
-        let gameStarted = false;
-        let animationFrameId = null;
+    <!-- UI 層：遊戲結束 Modal -->
+    <div id="gameOverModal" class="relative z-20 hidden inset-0 flex items-center justify-center p-6 bg-slate-950/85 backdrop-blur-md">
+      <div class="w-full bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center space-y-4">
+        
+        <h2 class="text-2xl font-black text-red-400 tracking-wider">GAME OVER</h2>
+        
+        <div class="py-2">
+          <span class="text-slate-400 text-xs uppercase tracking-widest block mb-1">本次得分</span>
+          <span id="finalScore" class="pixel-font text-5xl text-amber-400">0</span>
+        </div>
 
-        // Character physics & glowing settings
-        const characters = {
-            wukong: { 
-                name: '孫悟空', 
-                icon: '🐒', 
-                color: '#f59e0b', 
-                gravity: 0.12, 
-                lift: -4.2, 
-                maxFall: 3.5,
-                glowColor: '#fbbf24',
-                secondaryGlow: '#ef4444'
-            },
-            sailormoon: { 
-                name: '美少女戰士', 
-                icon: '💖', 
-                color: '#ec4899', 
-                gravity: 0.10, 
-                lift: -4.0, 
-                maxFall: 3.2,
-                glowColor: '#f472b6',
-                secondaryGlow: '#c084fc'
-            },
-            alien: { 
-                name: '外星人', 
-                icon: '👽', 
-                color: '#10b981', 
-                gravity: 0.10, 
-                lift: -3.8, 
-                maxFall: 3.0,
-                glowColor: '#34d399',
-                secondaryGlow: '#06b6d4'
-            }
-        };
+        <!-- 名字輸入區域 (居中排版) -->
+        <div class="w-full space-y-2">
+          <label class="text-xs text-slate-300 font-bold block">輸入名稱登錄英雄榜</label>
+          <div class="relative w-full">
+            <input type="text" id="playerNameInput" maxlength="10" placeholder="最多10個字元" 
+                   class="w-full bg-slate-950 border-2 border-slate-700 rounded-xl px-4 py-3 text-center text-amber-300 font-bold focus:outline-none focus:border-amber-400 transition"
+                   oninput="updateCharCount(this)">
+            <span id="charCounter" class="absolute right-3 top-3.5 text-[10px] text-slate-500">0/10</span>
+          </div>
+        </div>
 
-        let bird = {
-            x: 80,
-            y: 250,
-            radius: 20,
-            velocity: 0,
-            gravity: 0.12,
-            lift: -4.2,
-            maxFall: 3.5,
-            rotation: 0
-        };
+        <!-- 確認送出按鈕（位於輸入框正下方） -->
+        <button onclick="submitScore()" id="submitBtn" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg transition active:scale-95">
+          提交成績並查看排行
+        </button>
 
-        // Pipe configurations
-        let pipes = [];
-        let pipeWidth = 32;          // Halved width
-        let pipeGap = 190;           
-        let pipeSpacingInterval = 115; // 15% wider spacing
-        let pipeSpeed = 2.2; 
-        let frameCount = 0;
+        <button onclick="restartGame()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-600 transition">
+          直接再玩一次 🔄
+        </button>
+      </div>
+    </div>
 
-        let bgElements = [];
-        let auraParticles = []; // Custom aura particle system for ALL characters
+    <!-- UI 層：排行榜 Modal -->
+    <div id="leaderboardModal" class="relative z-30 hidden inset-0 flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
+      <div class="w-full max-h-[85%] bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-black text-amber-400 flex items-center gap-2">
+            <span>🏆</span> 全球英雄榜
+          </h3>
+          <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-white text-xl">✕</button>
+        </div>
 
-        // Web Audio API Sound Generator
-        let audioCtx = null;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+        <!-- 載入中動畫 -->
+        <div id="loadingLeaderboard" class="py-8 text-center text-xs text-slate-400 animate-pulse">
+          正從雲端載入最新排行榜...
+        </div>
+
+        <!-- 排行榜列表 -->
+        <div id="leaderboardList" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar hidden">
+          <!-- JS 動態渲染 -->
+        </div>
+
+        <button onclick="closeLeaderboard()" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-600">
+          關閉
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ==========================================
+    // Google Apps Script API 部署網址
+    // ==========================================
+    const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxLCuUVKY0rEfCkSMDB0Z3QfinY5Bf9dcebHwRTBgIwZXxuMNKaK_nmNEw1wBnrUHf7/exec";
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // 遊戲狀態
+    let gameState = 'MENU'; // 'MENU', 'PLAYING', 'GAMEOVER'
+    let selectedChar = null;
+    let score = 0;
+    let frameCount = 0;
+    let particles = [];
+    let bgParticles = [];
+    let soundEnabled = true;
+
+    // 音效設定 (Web Audio API)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (!soundEnabled) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'jump') {
+          osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.15);
+        } else if (type === 'score') {
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.2);
+        } else if (type === 'hit') {
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+          osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.25);
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+          osc.start();
+          osc.stop(audioCtx.currentTime + 0.25);
         }
+      } catch(e) {}
+    }
 
-        function playSound(type) {
-            try {
-                initAudio();
-                if (!audioCtx) return;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundBtn').innerText = soundEnabled ? '🔊' : '🔇';
+    }
 
-                const now = audioCtx.currentTime;
-                if (type === 'jump') {
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(320, now);
-                    osc.frequency.exponentialRampToValueAtTime(650, now + 0.15);
-                    gain.gain.setValueAtTime(0.2, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-                    osc.start(now);
-                    osc.stop(now + 0.15);
-                } else if (type === 'score') {
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(520, now);
-                    osc.frequency.setValueAtTime(880, now + 0.1);
-                    gain.gain.setValueAtTime(0.15, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                    osc.start(now);
-                    osc.stop(now + 0.2);
-                } else if (type === 'hit') {
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(160, now);
-                    osc.frequency.linearRampToValueAtTime(50, now + 0.3);
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
-                    osc.start(now);
-                    osc.stop(now + 0.3);
-                }
-            } catch (e) {
-                console.log("Audio play prevented");
-            }
+    // 角色屬性與主題
+    const CHARACTERS = {
+      wukong: {
+        name: '孫悟空',
+        icon: '🐒',
+        glowColor: '#ff9900',
+        particleColor: ['#ffcc00', '#ff6600', '#ff3300'],
+        bgType: 'desert'
+      },
+      sailor: {
+        name: '美少女戰士',
+        icon: '💖',
+        glowColor: '#ff66cc',
+        particleColor: ['#ff99ff', '#ff3399', '#ffffff'],
+        bgType: 'city'
+      },
+      alien: {
+        name: '外星人',
+        icon: '👽',
+        glowColor: '#00ffcc',
+        particleColor: ['#33ffff', '#00ff66', '#a855f7'],
+        bgType: 'space'
+      }
+    };
+
+    // 物理引擎調整（極極極致浮飄超慢下跌）
+    const bird = {
+      x: 80,
+      y: 300,
+      radius: 20,
+      velocity: 0,
+      gravity: 0.08,    // 極低重力，慢速滑翔
+      jump: -3.2,       // 輕盈柔和微跳
+      rotation: 0
+    };
+
+    // 柱子/障礙物設定（柱子幼一半、間距加寬）
+    let pipes = [];
+    const pipeConfig = {
+      width: 28,        // 寬度減半 (56 -> 28)
+      gap: 200,         // 上下開口極度寬敞
+      spawnRate: 150,   // 水平距離加寬 15%
+      speed: 1.4        // 速度放慢 20%
+    };
+
+    // 初始化與事件監聽
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') handleJump();
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      handleJump();
+    });
+
+    function handleJump() {
+      if (gameState === 'PLAYING') {
+        bird.velocity = bird.jump;
+        playSound('jump');
+        // 產生跳躍特效粒子
+        for (let i = 0; i < 6; i++) {
+          particles.push({
+            x: bird.x - 10,
+            y: bird.y + 10,
+            vx: (Math.random() - 0.5) * 2 - 1.5,
+            vy: Math.random() * 1.5 + 0.5,
+            size: Math.random() * 5 + 3,
+            color: CHARACTERS[selectedChar].particleColor[Math.floor(Math.random() * CHARACTERS[selectedChar].particleColor.length)],
+            life: 1
+          });
         }
+      }
+    }
 
-        function resizeCanvas() {
-            const container = document.getElementById('game-container');
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+    function selectCharacter(key) {
+      selectedChar = key;
+      document.getElementById('charSelectMenu').classList.add('hidden');
+      document.getElementById('gameHUD').classList.remove('hidden');
+      initBgParticles();
+      resetGame();
+      gameState = 'PLAYING';
+      requestAnimationFrame(gameLoop);
+    }
 
-        function selectCharacter(charKey) {
-            selectedChar = charKey;
-            const charData = characters[charKey];
-            bird.gravity = charData.gravity;
-            bird.lift = charData.lift;
-            bird.maxFall = charData.maxFall;
+    function resetGame() {
+      bird.y = 300;
+      bird.velocity = 0;
+      bird.rotation = 0;
+      pipes = [];
+      particles = [];
+      score = 0;
+      frameCount = 0;
+      document.getElementById('scoreDisplay').innerText = '0';
+    }
 
-            document.getElementById('screen-select').classList.add('hidden');
-            document.getElementById('screen-game').classList.remove('hidden');
-            currentScreen = 'game';
-            
-            initGameSession();
-        }
+    function updateCharCount(input) {
+      document.getElementById('charCounter').innerText = `${input.value.length}/10`;
+    }
 
-        function initGameSession() {
-            resizeCanvas();
-            bird.x = canvas.width * 0.25;
-            bird.y = canvas.height * 0.5;
-            bird.velocity = 0;
-            bird.rotation = 0;
-            pipes = [];
-            auraParticles = [];
-            score = 0;
-            frameCount = 0;
-            gameOver = false;
-            gameStarted = false;
-            document.getElementById('live-score').innerText = '0';
-            document.getElementById('tap-hint').style.opacity = '1';
-
-            initScenery();
-
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            loop();
-        }
-
-        function initScenery() {
-            bgElements = [];
-            for (let i = 0; i < 35; i++) {
-                bgElements.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 3 + 1,
-                    speed: Math.random() * 0.5 + 0.2
-                });
-            }
-        }
-
-        function drawBackground() {
-            const w = canvas.width;
-            const h = canvas.height;
-
-            if (selectedChar === 'wukong') {
-                // Desert Pyramids
-                let gradient = ctx.createLinearGradient(0, 0, 0, h);
-                gradient.addColorStop(0, '#f97316');
-                gradient.addColorStop(0.6, '#fde047');
-                gradient.addColorStop(1, '#ca8a04');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, w, h);
-
-                // Sun
-                ctx.fillStyle = '#fef08a';
-                ctx.beginPath();
-                ctx.arc(w * 0.8, h * 0.2, 40, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Pyramids
-                ctx.fillStyle = '#b45309';
-                ctx.beginPath();
-                ctx.moveTo(0, h * 0.85);
-                ctx.lineTo(w * 0.35, h * 0.55);
-                ctx.lineTo(w * 0.7, h * 0.85);
-                ctx.lineTo(w, h * 0.65);
-                ctx.lineTo(w, h);
-                ctx.lineTo(0, h);
-                ctx.closePath();
-                ctx.fill();
-
-            } else if (selectedChar === 'sailormoon') {
-                // Cute Romantic Pink/Purple Night City Scene
-                let gradient = ctx.createLinearGradient(0, 0, 0, h);
-                gradient.addColorStop(0, '#1e1b4b');
-                gradient.addColorStop(0.5, '#701a75');
-                gradient.addColorStop(1, '#f472b6');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, w, h);
-
-                // Magical Crescent Moon & Stars
-                ctx.fillStyle = '#fef08a';
-                ctx.beginPath();
-                ctx.arc(w * 0.75, h * 0.18, 32, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#701a75';
-                ctx.beginPath();
-                ctx.arc(w * 0.75 + 10, h * 0.18 - 4, 28, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Stars
-                bgElements.forEach(star => {
-                    ctx.fillStyle = '#fbcfe8';
-                    ctx.globalAlpha = Math.sin(frameCount * 0.05 + star.x) * 0.5 + 0.5;
-                    ctx.fillRect(star.x, star.y, star.size + 1, star.size + 1);
-                });
-                ctx.globalAlpha = 1.0;
-
-                // City Silhouette
-                ctx.fillStyle = '#2e1065';
-                let buildingX = 0;
-                while (buildingX < w) {
-                    let bWidth = 35 + (buildingX % 25);
-                    let bHeight = 110 + ((buildingX * 17) % 170);
-                    ctx.fillRect(buildingX, h - bHeight, bWidth, bHeight);
-
-                    ctx.fillStyle = '#fde047';
-                    for (let wx = buildingX + 6; wx < buildingX + bWidth - 6; wx += 10) {
-                        for (let wy = h - bHeight + 15; wy < h - 15; wy += 18) {
-                            if ((wx + wy) % 3 === 0) ctx.fillRect(wx, wy, 4, 7);
-                        }
-                    }
-                    ctx.fillStyle = '#2e1065';
-                    buildingX += bWidth + 6;
-                }
-
-            } else if (selectedChar === 'alien') {
-                // Deep Space & Stars
-                ctx.fillStyle = '#020617';
-                ctx.fillRect(0, 0, w, h);
-
-                ctx.fillStyle = '#ffffff';
-                bgElements.forEach(star => {
-                    ctx.globalAlpha = 0.8;
-                    ctx.fillRect(star.x, star.y, star.size, star.size);
-                    star.x -= star.speed;
-                    if (star.x < 0) star.x = w;
-                });
-                ctx.globalAlpha = 1.0;
-
-                // Planet
-                ctx.fillStyle = '#059669';
-                ctx.beginPath();
-                ctx.arc(w * 0.8, h * 0.22, 28, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = '#34d399';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.ellipse(w * 0.8, h * 0.22, 45, 10, Math.PI / 6, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-        }
-
-        function drawPipes() {
-            pipes.forEach(pipe => {
-                let pipeColor = '#15803d';
-                let pipeBorder = '#166534';
-                if (selectedChar === 'wukong') {
-                    pipeColor = '#d97706';
-                    pipeBorder = '#b45309';
-                } else if (selectedChar === 'sailormoon') {
-                    pipeColor = '#f472b6';
-                    pipeBorder = '#db2777';
-                } else if (selectedChar === 'alien') {
-                    pipeColor = '#059669';
-                    pipeBorder = '#047857';
-                }
-
-                // Top Pipe
-                ctx.fillStyle = pipeColor;
-                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
-                ctx.strokeStyle = pipeBorder;
-                ctx.lineWidth = 3;
-                ctx.strokeRect(pipe.x, -5, pipeWidth, pipe.top + 5);
-
-                // Bottom Pipe
-                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
-                ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom + 5);
-            });
-        }
-
-        function updatePipes() {
-            if (!gameStarted || isPaused || gameOver) return;
-
-            if (frameCount % pipeSpacingInterval === 0) {
-                let minHeight = 60;
-                let maxHeight = canvas.height - pipeGap - 120;
-                let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
-                let bottomHeight = canvas.height - topHeight - pipeGap;
-
-                pipes.push({
-                    x: canvas.width,
-                    top: topHeight,
-                    bottom: bottomHeight,
-                    passed: false
-                });
-            }
-
-            for (let i = pipes.length - 1; i >= 0; i--) {
-                pipes[i].x -= pipeSpeed;
-
-                if (!pipes[i].passed && pipes[i].x + pipeWidth < bird.x) {
-                    score++;
-                    pipes[i].passed = true;
-                    document.getElementById('live-score').innerText = score;
-                    playSound('score');
-                }
-
-                if (pipes[i].x + pipeWidth < 0) {
-                    pipes.splice(i, 1);
-                }
-
-                if (
-                    bird.x + bird.radius > pipes[i].x &&
-                    bird.x - bird.radius < pipes[i].x + pipeWidth &&
-                    (bird.y - bird.radius < pipes[i].top || bird.y + bird.radius > canvas.height - pipes[i].bottom)
-                ) {
-                    triggerGameOver();
-                }
-            }
-
-            if (bird.y + bird.radius >= canvas.height || bird.y - bird.radius <= 0) {
-                triggerGameOver();
-            }
-        }
-
-        function drawBird() {
-            const charData = characters[selectedChar];
-
-            // 1. DYNAMIC AURA RINGS & GLOW PULSE (Behind character)
-            ctx.save();
-            ctx.translate(bird.x, bird.y);
-
-            let pulseScale = 1 + Math.sin(frameCount * 0.1) * 0.15;
-            
-            if (selectedChar === 'wukong') {
-                // Fiery Golden Sun Wukong Aura Rings
-                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.2 * pulseScale);
-                gradient.addColorStop(0, 'rgba(251, 191, 36, 0.8)');
-                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.4)');
-                gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(0, 0, bird.radius * 2.2 * pulseScale, 0, Math.PI * 2);
-                ctx.fill();
-
-            } else if (selectedChar === 'sailormoon') {
-                // Cute Pink Magic Girl Aura Rings
-                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.3 * pulseScale);
-                gradient.addColorStop(0, 'rgba(244, 114, 182, 0.85)');
-                gradient.addColorStop(0.5, 'rgba(192, 132, 252, 0.5)');
-                gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(0, 0, bird.radius * 2.3 * pulseScale, 0, Math.PI * 2);
-                ctx.fill();
-
-            } else if (selectedChar === 'alien') {
-                // Neon Cyber Alien Pulse Ring
-                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.1 * pulseScale);
-                gradient.addColorStop(0, 'rgba(52, 211, 153, 0.85)');
-                gradient.addColorStop(0.6, 'rgba(6, 182, 212, 0.4)');
-                gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(0, 0, bird.radius * 2.1 * pulseScale, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Outer Cyber Shield Ring
-                ctx.strokeStyle = '#34d399';
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.6;
-                ctx.beginPath();
-                ctx.arc(0, 0, bird.radius * 1.6, 0, Math.PI * 2);
-                ctx.stroke();
-                ctx.globalAlpha = 1.0;
-            }
-            ctx.restore();
-
-            // 2. MAIN BIRD BODY & ICON
-            ctx.save();
-            ctx.translate(bird.x, bird.y);
-            
-            bird.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.velocity / 10)));
-            ctx.rotate(bird.rotation);
-
-            // Canvas Glow Blur
-            ctx.shadowColor = charData.glowColor;
-            ctx.shadowBlur = 18;
-
-            // Main Circle
-            ctx.beginPath();
-            ctx.arc(0, 0, bird.radius, 0, Math.PI * 2);
-            ctx.fillStyle = charData.color;
-            ctx.fill();
-            ctx.lineWidth = 2.5;
-            ctx.strokeStyle = '#ffffff';
-            ctx.stroke();
-
-            // Icon Text
-            ctx.shadowBlur = 0;
-            ctx.font = selectedChar === 'sailormoon' ? '20px sans-serif' : '22px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText(charData.icon, 0, 1);
-
-            ctx.restore();
-
-            // 3. TRAILING PARTICLES (Unique per character)
-            if (gameStarted && !gameOver && !isPaused) {
-                if (frameCount % 2 === 0) {
-                    let particleType = 'sparkle';
-                    if (selectedChar === 'wukong') particleType = 'flame';
-                    else if (selectedChar === 'alien') particleType = 'stardust';
-
-                    auraParticles.push({
-                        x: bird.x - 15 + (Math.random() * 6 - 3),
-                        y: bird.y + (Math.random() * 12 - 6),
-                        size: Math.random() * 8 + 6,
-                        vy: selectedChar === 'wukong' ? -Math.random() * 1.5 - 0.5 : (Math.random() - 0.5),
-                        opacity: 1,
-                        type: particleType
-                    });
-                }
-
-                for (let i = auraParticles.length - 1; i >= 0; i--) {
-                    let p = auraParticles[i];
-                    p.x -= 1.8;
-                    p.y += p.vy;
-                    p.opacity -= 0.04;
-
-                    if (p.opacity <= 0) {
-                        auraParticles.splice(i, 1);
-                    } else {
-                        ctx.save();
-                        ctx.globalAlpha = p.opacity;
-
-                        if (p.type === 'flame') {
-                            // Wukong Rising Golden Flame Particles
-                            ctx.fillStyle = (i % 2 === 0) ? '#fbbf24' : '#ef4444';
-                            ctx.shadowColor = '#f59e0b';
-                            ctx.shadowBlur = 8;
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
-                            ctx.fill();
-
-                        } else if (p.type === 'sparkle') {
-                            // Sailor Moon Heart/Sparkle Particles
-                            ctx.font = `${p.size}px sans-serif`;
-                            ctx.fillText((i % 2 === 0) ? '✨' : '💖', p.x, p.y);
-
-                        } else if (p.type === 'stardust') {
-                            // Alien Cyan/Green Cosmic Energy Particles
-                            ctx.fillStyle = (i % 2 === 0) ? '#34d399' : '#06b6d4';
-                            ctx.shadowColor = '#10b981';
-                            ctx.shadowBlur = 10;
-                            ctx.beginPath();
-                            ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        ctx.restore();
-                    }
-                }
-            }
-        }
-
-        function updateBird() {
-            if (!gameStarted) return;
-            bird.velocity += bird.gravity;
-            if (bird.velocity > bird.maxFall) {
-                bird.velocity = bird.maxFall;
-            }
-            bird.y += bird.velocity;
-        }
-
-        function triggerJump() {
-            if (currentScreen !== 'game' || isPaused) return;
-            if (!gameStarted) {
-                gameStarted = true;
-                document.getElementById('tap-hint').style.opacity = '0';
-            }
-            if (!gameOver) {
-                bird.velocity = bird.lift;
-                playSound('jump');
-            }
-        }
-
-        function triggerGameOver() {
-            if (gameOver) return;
-            gameOver = true;
-            playSound('hit');
-            
-            document.getElementById('final-score').innerText = score;
-            document.getElementById('screen-gameover').classList.remove('hidden');
-            document.getElementById('score-submit-box').classList.remove('hidden');
-            document.getElementById('score-submitted-msg').classList.add('hidden');
-            
-            const nameInput = document.getElementById('player-name');
-            nameInput.value = '';
-            updateCharCount();
-            document.getElementById('error-msg').classList.add('hidden');
-            currentScreen = 'gameover';
-        }
-
-        function updateCharCount() {
-            const input = document.getElementById('player-name');
-            const countSpan = document.getElementById('char-count');
-            countSpan.innerText = `${input.value.length}/10`;
-        }
-
-        function loop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            drawBackground();
-            drawPipes();
-            drawBird();
-
-            if (!isPaused && !gameOver) {
-                updateBird();
-                updatePipes();
-                frameCount++;
-            }
-
-            if (currentScreen === 'game') {
-                animationFrameId = requestAnimationFrame(loop);
-            }
-        }
-
-        // Control listeners
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                e.preventDefault();
-                triggerJump();
-            }
+    // 初始化背景裝飾粒子（沙漠塵埃/都市星光/太空星系）
+    function initBgParticles() {
+      bgParticles = [];
+      const count = selectedChar === 'space' ? 60 : 30;
+      for (let i = 0; i < count; i++) {
+        bgParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2 + 1,
+          speed: Math.random() * 0.5 + 0.2,
+          opacity: Math.random()
         });
+      }
+    }
 
-        canvas.addEventListener('click', () => {
-            triggerJump();
+    // 遊戲主要邏輯循環
+    function gameLoop() {
+      if (gameState !== 'PLAYING') return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawBackground();
+      updateAndDrawPipes();
+      updateAndDrawBird();
+      updateAndDrawParticles();
+
+      frameCount++;
+      requestAnimationFrame(gameLoop);
+    }
+
+    // 繪製背景
+    function drawBackground() {
+      const bgType = CHARACTERS[selectedChar].bgType;
+
+      if (bgType === 'desert') {
+        // 沙漠背景
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#7c2d12');
+        grad.addColorStop(0.6, '#c2410c');
+        grad.addColorStop(1, '#f59e0b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 太陽
+        ctx.fillStyle = '#fef08a';
+        ctx.beginPath();
+        ctx.arc(300, 120, 40, 0, Math.PI * 2);
+        ctx.fill();
+
+      } else if (bgType === 'city') {
+        // 都市夜景背景
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#0f172a');
+        grad.addColorStop(0.7, '#581c87');
+        grad.addColorStop(1, '#831843');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 建築輪廓
+        ctx.fillStyle = '#1e1b4b';
+        ctx.fillRect(20, 480, 50, 200);
+        ctx.fillRect(80, 420, 70, 260);
+        ctx.fillRect(180, 500, 60, 180);
+        ctx.fillRect(260, 450, 80, 230);
+
+      } else if (bgType === 'space') {
+        // 太空背景
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        grad.addColorStop(0, '#020617');
+        grad.addColorStop(0.8, '#090d16');
+        grad.addColorStop(1, '#1e1b4b');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 動態背景星光/微粒
+      ctx.fillStyle = '#ffffff';
+      bgParticles.forEach(p => {
+        p.x -= p.speed;
+        if (p.x < 0) p.x = canvas.width;
+        ctx.globalAlpha = p.opacity;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1.0;
+    }
+
+    // 小鳥更新與繪製（含發光 Effect）
+    function updateAndDrawBird() {
+      bird.velocity += bird.gravity;
+      bird.y += bird.velocity;
+
+      // 旋轉平滑傾斜
+      bird.rotation = Math.min(Math.PI / 6, Math.max(-Math.PI / 8, bird.velocity * 0.08));
+
+      // 碰撞天花板與地面
+      if (bird.y + bird.radius >= canvas.height - 20 || bird.y - bird.radius <= 0) {
+        triggerGameOver();
+        return;
+      }
+
+      ctx.save();
+      ctx.translate(bird.x, bird.y);
+      ctx.rotate(bird.rotation);
+
+      // 繪製發光 Aura
+      const charInfo = CHARACTERS[selectedChar];
+      const glowGrad = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 1.8);
+      glowGrad.addColorStop(0, charInfo.glowColor);
+      glowGrad.addColorStop(1, 'transparent');
+      
+      ctx.fillStyle = glowGrad;
+      ctx.beginPath();
+      ctx.arc(0, 0, bird.radius * 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 繪製角色 Icon Emoji
+      ctx.font = '32px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(charInfo.icon, 0, 0);
+
+      ctx.restore();
+    }
+
+    // 管道障礙物 logic
+    function updateAndDrawPipes() {
+      if (frameCount % pipeConfig.spawnRate === 0) {
+        const minTop = 60;
+        const maxTop = canvas.height - pipeConfig.gap - 100;
+        const topHeight = Math.floor(Math.random() * (maxTop - minTop + 1)) + minTop;
+        pipes.push({
+          x: canvas.width,
+          top: topHeight,
+          passed: false
         });
+      }
 
-        canvas.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            triggerJump();
-        }, { passive: false });
+      pipes.forEach((pipe, index) => {
+        pipe.x -= pipeConfig.speed;
 
-        function togglePause() {
-            if (currentScreen === 'game') {
-                isPaused = true;
-                document.getElementById('screen-pause').classList.remove('hidden');
-                currentScreen = 'pause';
-            } else if (currentScreen === 'pause') {
-                isPaused = false;
-                document.getElementById('screen-pause').classList.add('hidden');
-                currentScreen = 'game';
-                loop();
-            }
+        // 管道顏色搭配背景
+        let pipeColor = '#10b981';
+        let capColor = '#059669';
+
+        if (CHARACTERS[selectedChar].bgType === 'desert') {
+          pipeColor = '#d97706'; capColor = '#b45309';
+        } else if (CHARACTERS[selectedChar].bgType === 'city') {
+          pipeColor = '#ec4899'; capColor = '#be185d';
+        } else if (CHARACTERS[selectedChar].bgType === 'space') {
+          pipeColor = '#06b6d4'; capColor = '#0891b2';
         }
 
-        function restartGame() {
-            document.getElementById('screen-gameover').classList.add('hidden');
-            document.getElementById('screen-pause').classList.add('hidden');
-            currentScreen = 'game';
-            isPaused = false;
-            initGameSession();
+        // 上管道
+        ctx.fillStyle = pipeColor;
+        ctx.fillRect(pipe.x, 0, pipeConfig.width, pipe.top);
+        ctx.fillStyle = capColor;
+        ctx.fillRect(pipe.x - 3, pipe.top - 12, pipeConfig.width + 6, 12);
+
+        // 下管道
+        const bottomY = pipe.top + pipeConfig.gap;
+        const bottomHeight = canvas.height - bottomY;
+        ctx.fillStyle = pipeColor;
+        ctx.fillRect(pipe.x, bottomY, pipeConfig.width, bottomHeight);
+        ctx.fillStyle = capColor;
+        ctx.fillRect(pipe.x - 3, bottomY, pipeConfig.width + 6, 12);
+
+        // 碰撞偵測
+        if (
+          bird.x + bird.radius - 4 > pipe.x &&
+          bird.x - bird.radius + 4 < pipe.x + pipeConfig.width &&
+          (bird.y - bird.radius + 4 < pipe.top || bird.y + bird.radius - 4 > bottomY)
+        ) {
+          triggerGameOver();
         }
 
-        function returnToMenu() {
-            document.getElementById('screen-gameover').classList.add('hidden');
-            document.getElementById('screen-pause').classList.add('hidden');
-            document.getElementById('screen-game').classList.add('hidden');
-            document.getElementById('screen-select').classList.remove('hidden');
-            currentScreen = 'select';
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        // 加分計數
+        if (!pipe.passed && pipe.x + pipeConfig.width < bird.x) {
+          pipe.passed = true;
+          score++;
+          document.getElementById('scoreDisplay').innerText = score;
+          playSound('score');
         }
+      });
 
-        function getLeaderboard() {
-            try {
-                const data = localStorage.getItem('flappy_hero_leaderboard');
-                return data ? JSON.parse(data) : [];
-            } catch (e) {
-                return [];
-            }
+      // 移除畫面外管道
+      pipes = pipes.filter(p => p.x + pipeConfig.width > -20);
+    }
+
+    // 尾跡粒子系統
+    function updateAndDrawParticles() {
+      particles.forEach((p, index) => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.03;
+
+        if (p.life <= 0) {
+          particles.splice(index, 1);
+        } else {
+          ctx.globalAlpha = p.life;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
         }
+      });
+      ctx.globalAlpha = 1.0;
+    }
 
-        function saveLeaderboard(board) {
-            try {
-                localStorage.setItem('flappy_hero_leaderboard', JSON.stringify(board));
-            } catch (e) {}
-        }
+    // 觸發遊戲結束
+    function triggerGameOver() {
+      gameState = 'GAMEOVER';
+      playSound('hit');
+      document.getElementById('finalScore').innerText = score;
+      document.getElementById('gameOverModal').classList.remove('hidden');
+    }
 
-        function submitScore() {
-            const nameInput = document.getElementById('player-name');
-            const errorMsg = document.getElementById('error-msg');
-            const name = nameInput.value.trim();
+    function restartGame() {
+      document.getElementById('gameOverModal').classList.add('hidden');
+      resetGame();
+      gameState = 'PLAYING';
+      requestAnimationFrame(gameLoop);
+    }
 
-            if (name.length === 0 || name.length > 10) {
-                errorMsg.classList.remove('hidden');
-                return;
-            }
-            errorMsg.classList.add('hidden');
+    // 提交成績至 Google 試算表 (Google Apps Script)
+    function submitScore() {
+      const nameInput = document.getElementById('playerNameInput');
+      const name = nameInput.value.trim() || '無名英雄';
+      const btn = document.getElementById('submitBtn');
 
-            let leaderboard = getLeaderboard();
-            leaderboard.push({
-                name: name,
-                score: score,
-                character: characters[selectedChar].name,
-                date: new Date().toLocaleDateString()
-            });
+      btn.disabled = true;
+      btn.innerText = '正在連線傳送成績...';
 
-            leaderboard.sort((a, b) => b.score - a.score);
-            leaderboard = leaderboard.slice(0, 10);
+      fetch(GAS_API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, score: score })
+      })
+      .then(() => {
+        btn.innerText = '成績登錄成功！';
+        setTimeout(() => {
+          document.getElementById('gameOverModal').classList.add('hidden');
+          openLeaderboard();
+          btn.disabled = false;
+          btn.innerText = '提交成績並查看排行';
+        }, 800);
+      })
+      .catch(err => {
+        alert('連線失敗，將優先顯示本地紀錄');
+        document.getElementById('gameOverModal').classList.add('hidden');
+        openLeaderboard();
+        btn.disabled = false;
+        btn.innerText = '提交成績並查看排行';
+      });
+    }
 
-            saveLeaderboard(leaderboard);
+    // 打開排行榜 Modal，向 Google Apps Script 抓取前 10 名
+    function openLeaderboard() {
+      const modal = document.getElementById('leaderboardModal');
+      const loading = document.getElementById('loadingLeaderboard');
+      const list = document.getElementById('leaderboardList');
 
-            document.getElementById('score-submit-box').classList.add('hidden');
-            document.getElementById('score-submitted-msg').classList.remove('hidden');
-        }
+      modal.classList.remove('hidden');
+      loading.classList.remove('hidden');
+      list.classList.add('hidden');
+      list.innerHTML = '';
 
-        function showLeaderboardFromMenu() {
-            renderLeaderboardList();
-            document.getElementById('screen-leaderboard').classList.remove('hidden');
-            currentScreen = 'leaderboard';
-        }
+      fetch(GAS_API_URL)
+        .then(res => res.json())
+        .then(data => {
+          loading.classList.add('hidden');
+          list.classList.remove('hidden');
 
-        function closeLeaderboard() {
-            document.getElementById('screen-leaderboard').classList.add('hidden');
-            if (currentScreen === 'leaderboard') {
-                currentScreen = 'select';
-            }
-        }
+          if (!data || data.length === 0) {
+            list.innerHTML = '<div class="text-center text-slate-500 py-4 text-xs">目前還沒有玩家登錄紀錄</div>';
+            return;
+          }
 
-        function renderLeaderboardList() {
-            const listEl = document.getElementById('leaderboard-list');
-            const leaderboard = getLeaderboard();
+          data.forEach((item, index) => {
+            let rankBadge = `<span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center text-xs font-bold">${index + 1}</span>`;
+            if (index === 0) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center text-xs font-black">1</span>`;
+            if (index === 1) rankBadge = `<span class="w-6 h-6 rounded-full bg-slate-300 text-slate-950 flex items-center justify-center text-xs font-black">2</span>`;
+            if (index === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white flex items-center justify-center text-xs font-black">3</span>`;
 
-            if (leaderboard.length === 0) {
-                listEl.innerHTML = `<div class="text-center text-slate-500 py-10">尚無排行榜紀錄，快來挑戰第一名！</div>`;
-                return;
-            }
+            const row = document.createElement('div');
+            row.className = 'flex items-center justify-between p-3 bg-slate-950/60 rounded-xl border border-slate-800';
+            row.innerHTML = `
+              <div class="flex items-center gap-3">
+                ${rankBadge}
+                <span class="font-bold text-sm text-slate-200 truncate max-w-[140px]">${escapeHtml(item.name)}</span>
+              </div>
+              <span class="pixel-font text-amber-400 text-sm">${item.score}</span>
+            `;
+            list.appendChild(row);
+          });
+        })
+        .catch(err => {
+          loading.innerText = '讀取排行榜失敗，請重新嘗試';
+        });
+    }
 
-            let html = '';
-            leaderboard.forEach((entry, idx) => {
-                let badgeColor = 'text-slate-400 border-slate-700 bg-slate-900';
-                if (idx === 0) badgeColor = 'text-amber-300 border-amber-500 bg-amber-950/40';
-                else if (idx === 1) badgeColor = 'text-slate-200 border-slate-400 bg-slate-800/40';
-                else if (idx === 2) badgeColor = 'text-amber-600 border-amber-700 bg-amber-950/20';
+    function closeLeaderboard() {
+      document.getElementById('leaderboardModal').classList.add('hidden');
+      if (gameState === 'GAMEOVER') {
+        document.getElementById('charSelectMenu').classList.remove('hidden');
+        document.getElementById('gameHUD').classList.add('hidden');
+        gameState = 'MENU';
+      }
+    }
 
-                html += `
-                    <div class="flex items-center justify-between p-3 rounded-xl border ${badgeColor}">
-                        <div class="flex items-center gap-3 truncate pr-2">
-                            <span class="arcade-font text-sm font-bold w-6 text-center flex-shrink-0">#${idx + 1}</span>
-                            <div class="truncate">
-                                <div class="font-bold text-white tracking-wider truncate">${entry.name}</div>
-                                <div class="text-xs text-slate-400">英雄: ${entry.character}</div>
-                            </div>
-                        </div>
-                        <div class="arcade-font text-amber-400 text-lg flex-shrink-0">${entry.score}</div>
-                    </div>
-                `;
-            });
-            listEl.innerHTML = html;
-        }
-    </script>
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"']/g, function(m) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+      });
+    }
+  </script>
 </body>
 </html>
