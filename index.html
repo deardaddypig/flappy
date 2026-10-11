@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Hero - 多重宇宙大冒險</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .arcade-font {
+            font-family: 'Press Start 2P', monospace;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .floating {
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        /* Wukong Flame Glow Keyframe */
+        @keyframes wukongGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.9)) drop-shadow(0 0 16px rgba(239, 68, 68, 0.7)); }
+            50% { filter: drop-shadow(0 0 18px rgba(251, 191, 36, 1)) drop-shadow(0 0 24px rgba(245, 158, 11, 0.9)); }
+        }
+        .wukong-glow {
+            animation: wukongGlow 1.2s infinite ease-in-out;
+        }
+
+        /* Sailor Moon Magic Glow Keyframe */
+        @keyframes magicGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(244, 114, 182, 0.9)) drop-shadow(0 0 16px rgba(192, 132, 252, 0.7)); }
+            50% { filter: drop-shadow(0 0 18px rgba(251, 207, 232, 1)) drop-shadow(0 0 25px rgba(244, 114, 182, 1)); }
+        }
+        .magic-glow {
+            animation: magicGlow 1.5s infinite ease-in-out;
+        }
+
+        /* Alien Matrix Neon Glow Keyframe */
+        @keyframes alienGlow {
+            0%, 100% { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.9)) drop-shadow(0 0 16px rgba(6, 182, 212, 0.7)); }
+            50% { filter: drop-shadow(0 0 18px rgba(52, 211, 153, 1)) drop-shadow(0 0 25px rgba(16, 185, 129, 1)); }
+        }
+        .alien-glow {
+            animation: alienGlow 1.4s infinite ease-in-out;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.9); }
+        }
+        .glow-btn {
+            animation: pulseGlow 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white min-h-screen flex flex-col items-center justify-center overflow-hidden m-0 p-0">
+
+    <div id="game-container" class="relative w-full max-w-md h-[700px] bg-slate-900 shadow-2xl overflow-hidden flex flex-col justify-between border-4 border-slate-700 sm:rounded-2xl">
+
+        <!-- Character Selection Screen -->
+        <div id="screen-select" class="absolute inset-0 bg-slate-950/95 z-30 flex flex-col items-center justify-center p-6 text-center">
+            <h1 class="arcade-font text-2xl md:text-3xl text-amber-400 mb-2 drop-shadow-[0_4px_4px_rgba(0,0,0,0.8)]">FLAPPY HERO</h1>
+            <p class="text-slate-400 text-sm mb-6">選擇你的英雄，挑戰無盡宇宙！</p>
+            
+            <div class="grid grid-cols-1 gap-4 w-full max-w-xs mb-8">
+                <!-- Wukong -->
+                <button onclick="selectCharacter('wukong')" class="flex items-center p-4 bg-amber-950/60 border-2 border-amber-500 rounded-xl hover:bg-amber-900/80 transition transform hover:scale-105 group text-left">
+                    <div class="text-3xl mr-4 bg-amber-900/50 p-2 rounded-lg group-hover:rotate-12 transition wukong-glow">🔥🐒</div>
+                    <div>
+                        <div class="font-bold text-amber-300 text-lg flex items-center gap-1">齊天大聖 孫悟空 <span class="text-xs">🔥</span></div>
+                        <div class="text-xs text-amber-400/80">黃金烈焰光環 / 絕美沙漠背景</div>
+                    </div>
+                </button>
+
+                <!-- Sailor Moon -->
+                <button onclick="selectCharacter('sailormoon')" class="flex items-center p-4 bg-pink-950/60 border-2 border-pink-500 rounded-xl hover:bg-pink-900/80 transition transform hover:scale-105 group text-left">
+                    <div class="text-3xl mr-4 bg-pink-900/50 p-2 rounded-lg group-hover:-rotate-12 transition magic-glow">💖✨</div>
+                    <div>
+                        <div class="font-bold text-pink-300 text-lg flex items-center gap-1">美少女戰士 <span class="text-xs">✨</span></div>
+                        <div class="text-xs text-pink-400/80">夢幻魔法愛心光環 / 璀璨夜空</div>
+                    </div>
+                </button>
+
+                <!-- Alien -->
+                <button onclick="selectCharacter('alien')" class="flex items-center p-4 bg-emerald-950/60 border-2 border-emerald-500 rounded-xl hover:bg-emerald-900/80 transition transform hover:scale-105 group text-left">
+                    <div class="text-3xl mr-4 bg-emerald-900/50 p-2 rounded-lg group-hover:scale-110 transition alien-glow">👽🛸</div>
+                    <div>
+                        <div class="font-bold text-emerald-300 text-lg flex items-center gap-1">星際外星人 <span class="text-xs">💫</span></div>
+                        <div class="text-xs text-emerald-400/80">螢光矩陣脈衝 / 浩瀚星空背景</div>
+                    </div>
+                </button>
+            </div>
+            
+            <button onclick="showLeaderboardFromMenu()" class="text-sm text-slate-400 underline hover:text-white transition">查看全球排行榜</button>
+        </div>
+
+        <!-- Canvas Game Screen -->
+        <div id="screen-game" class="relative w-full h-full hidden">
+            <canvas id="gameCanvas" class="w-full h-full block cursor-pointer"></canvas>
+            
+            <div class="absolute top-4 left-0 right-0 flex justify-between items-center px-6 pointer-events-none z-10">
+                <div class="arcade-font text-2xl text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" id="live-score">0</div>
+                <button onclick="togglePause()" class="pointer-events-auto bg-slate-800/80 hover:bg-slate-700 text-white px-3 py-1 rounded-lg text-sm border border-slate-600">暫停</button>
+            </div>
+
+            <div id="tap-hint" class="absolute inset-x-0 bottom-20 flex justify-center pointer-events-none z-10 transition-opacity duration-300">
+                <div class="bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm arcade-font floating">
+                    點擊螢幕 / 空白鍵 飛行
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="screen-gameover" class="absolute inset-0 bg-slate-950/95 z-30 hidden flex flex-col items-center justify-center p-6 text-center">
+            <h2 class="arcade-font text-3xl text-rose-500 mb-1">遊戲結束</h2>
+            <p class="text-slate-400 text-xs mb-4">英雄長眠於此，記錄你的名字吧！</p>
+            
+            <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl w-full max-w-xs mb-5 shadow-2xl flex flex-col items-center">
+                <div class="text-slate-400 text-xs mb-1">最終得分</div>
+                <div id="final-score" class="arcade-font text-4xl text-amber-400 mb-4">0</div>
+                
+                <div id="score-submit-box" class="w-full flex flex-col items-center">
+                    <label class="block text-xs text-slate-300 mb-2 font-medium">輸入英雄大名 (最多 10 個字元)</label>
+                    
+                    <div class="relative w-full mb-3">
+                        <input type="text" id="player-name" maxlength="10" placeholder="輸入名稱" oninput="updateCharCount()" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-white text-center font-bold focus:outline-none focus:border-amber-500 transition shadow-inner">
+                        <span id="char-count" class="absolute right-3 top-2.5 text-xs text-slate-500 pointer-events-none">0/10</span>
+                    </div>
+
+                    <button onclick="submitScore()" class="w-full bg-amber-500 hover:bg-amber-400 active:bg-amber-600 text-slate-950 font-extrabold py-2.5 rounded-xl transition shadow-lg transform active:scale-98">
+                        確定送出
+                    </button>
+
+                    <p id="error-msg" class="text-rose-400 text-xs mt-2 hidden">請輸入 1 至 10 個字元！</p>
+                </div>
+
+                <div id="score-submitted-msg" class="hidden text-emerald-400 font-bold text-sm py-2">
+                    ✓ 紀錄已成功存入排行榜！
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2.5 w-full max-w-xs">
+                <button onclick="restartGame()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition glow-btn">再玩一次</button>
+                <button onclick="returnToMenu()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">返回主選單</button>
+            </div>
+        </div>
+
+        <!-- Leaderboard Screen -->
+        <div id="screen-leaderboard" class="absolute inset-0 bg-slate-950/95 z-40 hidden flex flex-col p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="arcade-font text-xl text-amber-400">英雄排行榜</h2>
+                <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-white text-xl font-bold px-2">✕</button>
+            </div>
+            
+            <div class="flex-1 overflow-y-auto space-y-3 mb-6" id="leaderboard-list">
+                <!-- Dynamically populated leaderboard items -->
+            </div>
+
+            <button onclick="closeLeaderboard()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">關閉</button>
+        </div>
+
+        <!-- Pause Screen -->
+        <div id="screen-pause" class="absolute inset-0 bg-black/80 backdrop-blur-sm z-30 hidden flex flex-col items-center justify-center p-6 text-center">
+            <h2 class="arcade-font text-2xl text-white mb-6">遊戲暫停</h2>
+            <div class="flex flex-col gap-3 w-full max-w-xs">
+                <button onclick="togglePause()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl transition">繼續遊戲</button>
+                <button onclick="returnToMenu()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl transition border border-slate-700">放棄並返回主選單</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let currentScreen = 'select'; // select, game, gameover, pause, leaderboard
+        let selectedChar = 'wukong'; // wukong, sailormoon, alien
+        let score = 0;
+        let isPaused = false;
+        let gameOver = false;
+        let gameStarted = false;
+        let animationFrameId = null;
+
+        // Character physics & glowing settings
+        const characters = {
+            wukong: { 
+                name: '孫悟空', 
+                icon: '🐒', 
+                color: '#f59e0b', 
+                gravity: 0.12, 
+                lift: -4.2, 
+                maxFall: 3.5,
+                glowColor: '#fbbf24',
+                secondaryGlow: '#ef4444'
+            },
+            sailormoon: { 
+                name: '美少女戰士', 
+                icon: '💖', 
+                color: '#ec4899', 
+                gravity: 0.10, 
+                lift: -4.0, 
+                maxFall: 3.2,
+                glowColor: '#f472b6',
+                secondaryGlow: '#c084fc'
+            },
+            alien: { 
+                name: '外星人', 
+                icon: '👽', 
+                color: '#10b981', 
+                gravity: 0.10, 
+                lift: -3.8, 
+                maxFall: 3.0,
+                glowColor: '#34d399',
+                secondaryGlow: '#06b6d4'
+            }
+        };
+
+        let bird = {
+            x: 80,
+            y: 250,
+            radius: 20,
+            velocity: 0,
+            gravity: 0.12,
+            lift: -4.2,
+            maxFall: 3.5,
+            rotation: 0
+        };
+
+        // Pipe configurations
+        let pipes = [];
+        let pipeWidth = 32;          // Halved width
+        let pipeGap = 190;           
+        let pipeSpacingInterval = 115; // 15% wider spacing
+        let pipeSpeed = 2.2; 
+        let frameCount = 0;
+
+        let bgElements = [];
+        let auraParticles = []; // Custom aura particle system for ALL characters
+
+        // Web Audio API Sound Generator
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+                if (type === 'jump') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(650, now + 0.15);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+                } else if (type === 'score') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(520, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now);
+                    osc.stop(now + 0.2);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                }
+            } catch (e) {
+                console.log("Audio play prevented");
+            }
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('game-container');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function selectCharacter(charKey) {
+            selectedChar = charKey;
+            const charData = characters[charKey];
+            bird.gravity = charData.gravity;
+            bird.lift = charData.lift;
+            bird.maxFall = charData.maxFall;
+
+            document.getElementById('screen-select').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            currentScreen = 'game';
+            
+            initGameSession();
+        }
+
+        function initGameSession() {
+            resizeCanvas();
+            bird.x = canvas.width * 0.25;
+            bird.y = canvas.height * 0.5;
+            bird.velocity = 0;
+            bird.rotation = 0;
+            pipes = [];
+            auraParticles = [];
+            score = 0;
+            frameCount = 0;
+            gameOver = false;
+            gameStarted = false;
+            document.getElementById('live-score').innerText = '0';
+            document.getElementById('tap-hint').style.opacity = '1';
+
+            initScenery();
+
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            loop();
+        }
+
+        function initScenery() {
+            bgElements = [];
+            for (let i = 0; i < 35; i++) {
+                bgElements.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 3 + 1,
+                    speed: Math.random() * 0.5 + 0.2
+                });
+            }
+        }
+
+        function drawBackground() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            if (selectedChar === 'wukong') {
+                // Desert Pyramids
+                let gradient = ctx.createLinearGradient(0, 0, 0, h);
+                gradient.addColorStop(0, '#f97316');
+                gradient.addColorStop(0.6, '#fde047');
+                gradient.addColorStop(1, '#ca8a04');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, w, h);
+
+                // Sun
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(w * 0.8, h * 0.2, 40, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Pyramids
+                ctx.fillStyle = '#b45309';
+                ctx.beginPath();
+                ctx.moveTo(0, h * 0.85);
+                ctx.lineTo(w * 0.35, h * 0.55);
+                ctx.lineTo(w * 0.7, h * 0.85);
+                ctx.lineTo(w, h * 0.65);
+                ctx.lineTo(w, h);
+                ctx.lineTo(0, h);
+                ctx.closePath();
+                ctx.fill();
+
+            } else if (selectedChar === 'sailormoon') {
+                // Cute Romantic Pink/Purple Night City Scene
+                let gradient = ctx.createLinearGradient(0, 0, 0, h);
+                gradient.addColorStop(0, '#1e1b4b');
+                gradient.addColorStop(0.5, '#701a75');
+                gradient.addColorStop(1, '#f472b6');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, w, h);
+
+                // Magical Crescent Moon & Stars
+                ctx.fillStyle = '#fef08a';
+                ctx.beginPath();
+                ctx.arc(w * 0.75, h * 0.18, 32, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#701a75';
+                ctx.beginPath();
+                ctx.arc(w * 0.75 + 10, h * 0.18 - 4, 28, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Stars
+                bgElements.forEach(star => {
+                    ctx.fillStyle = '#fbcfe8';
+                    ctx.globalAlpha = Math.sin(frameCount * 0.05 + star.x) * 0.5 + 0.5;
+                    ctx.fillRect(star.x, star.y, star.size + 1, star.size + 1);
+                });
+                ctx.globalAlpha = 1.0;
+
+                // City Silhouette
+                ctx.fillStyle = '#2e1065';
+                let buildingX = 0;
+                while (buildingX < w) {
+                    let bWidth = 35 + (buildingX % 25);
+                    let bHeight = 110 + ((buildingX * 17) % 170);
+                    ctx.fillRect(buildingX, h - bHeight, bWidth, bHeight);
+
+                    ctx.fillStyle = '#fde047';
+                    for (let wx = buildingX + 6; wx < buildingX + bWidth - 6; wx += 10) {
+                        for (let wy = h - bHeight + 15; wy < h - 15; wy += 18) {
+                            if ((wx + wy) % 3 === 0) ctx.fillRect(wx, wy, 4, 7);
+                        }
+                    }
+                    ctx.fillStyle = '#2e1065';
+                    buildingX += bWidth + 6;
+                }
+
+            } else if (selectedChar === 'alien') {
+                // Deep Space & Stars
+                ctx.fillStyle = '#020617';
+                ctx.fillRect(0, 0, w, h);
+
+                ctx.fillStyle = '#ffffff';
+                bgElements.forEach(star => {
+                    ctx.globalAlpha = 0.8;
+                    ctx.fillRect(star.x, star.y, star.size, star.size);
+                    star.x -= star.speed;
+                    if (star.x < 0) star.x = w;
+                });
+                ctx.globalAlpha = 1.0;
+
+                // Planet
+                ctx.fillStyle = '#059669';
+                ctx.beginPath();
+                ctx.arc(w * 0.8, h * 0.22, 28, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#34d399';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(w * 0.8, h * 0.22, 45, 10, Math.PI / 6, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        }
+
+        function drawPipes() {
+            pipes.forEach(pipe => {
+                let pipeColor = '#15803d';
+                let pipeBorder = '#166534';
+                if (selectedChar === 'wukong') {
+                    pipeColor = '#d97706';
+                    pipeBorder = '#b45309';
+                } else if (selectedChar === 'sailormoon') {
+                    pipeColor = '#f472b6';
+                    pipeBorder = '#db2777';
+                } else if (selectedChar === 'alien') {
+                    pipeColor = '#059669';
+                    pipeBorder = '#047857';
+                }
+
+                // Top Pipe
+                ctx.fillStyle = pipeColor;
+                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.top);
+                ctx.strokeStyle = pipeBorder;
+                ctx.lineWidth = 3;
+                ctx.strokeRect(pipe.x, -5, pipeWidth, pipe.top + 5);
+
+                // Bottom Pipe
+                ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom);
+                ctx.strokeRect(pipe.x, canvas.height - pipe.bottom, pipeWidth, pipe.bottom + 5);
+            });
+        }
+
+        function updatePipes() {
+            if (!gameStarted || isPaused || gameOver) return;
+
+            if (frameCount % pipeSpacingInterval === 0) {
+                let minHeight = 60;
+                let maxHeight = canvas.height - pipeGap - 120;
+                let topHeight = Math.floor(Math.random() * (maxHeight - minHeight + 1)) + minHeight;
+                let bottomHeight = canvas.height - topHeight - pipeGap;
+
+                pipes.push({
+                    x: canvas.width,
+                    top: topHeight,
+                    bottom: bottomHeight,
+                    passed: false
+                });
+            }
+
+            for (let i = pipes.length - 1; i >= 0; i--) {
+                pipes[i].x -= pipeSpeed;
+
+                if (!pipes[i].passed && pipes[i].x + pipeWidth < bird.x) {
+                    score++;
+                    pipes[i].passed = true;
+                    document.getElementById('live-score').innerText = score;
+                    playSound('score');
+                }
+
+                if (pipes[i].x + pipeWidth < 0) {
+                    pipes.splice(i, 1);
+                }
+
+                if (
+                    bird.x + bird.radius > pipes[i].x &&
+                    bird.x - bird.radius < pipes[i].x + pipeWidth &&
+                    (bird.y - bird.radius < pipes[i].top || bird.y + bird.radius > canvas.height - pipes[i].bottom)
+                ) {
+                    triggerGameOver();
+                }
+            }
+
+            if (bird.y + bird.radius >= canvas.height || bird.y - bird.radius <= 0) {
+                triggerGameOver();
+            }
+        }
+
+        function drawBird() {
+            const charData = characters[selectedChar];
+
+            // 1. DYNAMIC AURA RINGS & GLOW PULSE (Behind character)
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+
+            let pulseScale = 1 + Math.sin(frameCount * 0.1) * 0.15;
+            
+            if (selectedChar === 'wukong') {
+                // Fiery Golden Sun Wukong Aura Rings
+                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.2 * pulseScale);
+                gradient.addColorStop(0, 'rgba(251, 191, 36, 0.8)');
+                gradient.addColorStop(0.5, 'rgba(245, 158, 11, 0.4)');
+                gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, bird.radius * 2.2 * pulseScale, 0, Math.PI * 2);
+                ctx.fill();
+
+            } else if (selectedChar === 'sailormoon') {
+                // Cute Pink Magic Girl Aura Rings
+                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.3 * pulseScale);
+                gradient.addColorStop(0, 'rgba(244, 114, 182, 0.85)');
+                gradient.addColorStop(0.5, 'rgba(192, 132, 252, 0.5)');
+                gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, bird.radius * 2.3 * pulseScale, 0, Math.PI * 2);
+                ctx.fill();
+
+            } else if (selectedChar === 'alien') {
+                // Neon Cyber Alien Pulse Ring
+                let gradient = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2.1 * pulseScale);
+                gradient.addColorStop(0, 'rgba(52, 211, 153, 0.85)');
+                gradient.addColorStop(0.6, 'rgba(6, 182, 212, 0.4)');
+                gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, bird.radius * 2.1 * pulseScale, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Outer Cyber Shield Ring
+                ctx.strokeStyle = '#34d399';
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.6;
+                ctx.beginPath();
+                ctx.arc(0, 0, bird.radius * 1.6, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1.0;
+            }
+            ctx.restore();
+
+            // 2. MAIN BIRD BODY & ICON
+            ctx.save();
+            ctx.translate(bird.x, bird.y);
+            
+            bird.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (bird.velocity / 10)));
+            ctx.rotate(bird.rotation);
+
+            // Canvas Glow Blur
+            ctx.shadowColor = charData.glowColor;
+            ctx.shadowBlur = 18;
+
+            // Main Circle
+            ctx.beginPath();
+            ctx.arc(0, 0, bird.radius, 0, Math.PI * 2);
+            ctx.fillStyle = charData.color;
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = '#ffffff';
+            ctx.stroke();
+
+            // Icon Text
+            ctx.shadowBlur = 0;
+            ctx.font = selectedChar === 'sailormoon' ? '20px sans-serif' : '22px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(charData.icon, 0, 1);
+
+            ctx.restore();
+
+            // 3. TRAILING PARTICLES (Unique per character)
+            if (gameStarted && !gameOver && !isPaused) {
+                if (frameCount % 2 === 0) {
+                    let particleType = 'sparkle';
+                    if (selectedChar === 'wukong') particleType = 'flame';
+                    else if (selectedChar === 'alien') particleType = 'stardust';
+
+                    auraParticles.push({
+                        x: bird.x - 15 + (Math.random() * 6 - 3),
+                        y: bird.y + (Math.random() * 12 - 6),
+                        size: Math.random() * 8 + 6,
+                        vy: selectedChar === 'wukong' ? -Math.random() * 1.5 - 0.5 : (Math.random() - 0.5),
+                        opacity: 1,
+                        type: particleType
+                    });
+                }
+
+                for (let i = auraParticles.length - 1; i >= 0; i--) {
+                    let p = auraParticles[i];
+                    p.x -= 1.8;
+                    p.y += p.vy;
+                    p.opacity -= 0.04;
+
+                    if (p.opacity <= 0) {
+                        auraParticles.splice(i, 1);
+                    } else {
+                        ctx.save();
+                        ctx.globalAlpha = p.opacity;
+
+                        if (p.type === 'flame') {
+                            // Wukong Rising Golden Flame Particles
+                            ctx.fillStyle = (i % 2 === 0) ? '#fbbf24' : '#ef4444';
+                            ctx.shadowColor = '#f59e0b';
+                            ctx.shadowBlur = 8;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size * 0.5, 0, Math.PI * 2);
+                            ctx.fill();
+
+                        } else if (p.type === 'sparkle') {
+                            // Sailor Moon Heart/Sparkle Particles
+                            ctx.font = `${p.size}px sans-serif`;
+                            ctx.fillText((i % 2 === 0) ? '✨' : '💖', p.x, p.y);
+
+                        } else if (p.type === 'stardust') {
+                            // Alien Cyan/Green Cosmic Energy Particles
+                            ctx.fillStyle = (i % 2 === 0) ? '#34d399' : '#06b6d4';
+                            ctx.shadowColor = '#10b981';
+                            ctx.shadowBlur = 10;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size * 0.4, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                        ctx.restore();
+                    }
+                }
+            }
+        }
+
+        function updateBird() {
+            if (!gameStarted) return;
+            bird.velocity += bird.gravity;
+            if (bird.velocity > bird.maxFall) {
+                bird.velocity = bird.maxFall;
+            }
+            bird.y += bird.velocity;
+        }
+
+        function triggerJump() {
+            if (currentScreen !== 'game' || isPaused) return;
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('tap-hint').style.opacity = '0';
+            }
+            if (!gameOver) {
+                bird.velocity = bird.lift;
+                playSound('jump');
+            }
+        }
+
+        function triggerGameOver() {
+            if (gameOver) return;
+            gameOver = true;
+            playSound('hit');
+            
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('screen-gameover').classList.remove('hidden');
+            document.getElementById('score-submit-box').classList.remove('hidden');
+            document.getElementById('score-submitted-msg').classList.add('hidden');
+            
+            const nameInput = document.getElementById('player-name');
+            nameInput.value = '';
+            updateCharCount();
+            document.getElementById('error-msg').classList.add('hidden');
+            currentScreen = 'gameover';
+        }
+
+        function updateCharCount() {
+            const input = document.getElementById('player-name');
+            const countSpan = document.getElementById('char-count');
+            countSpan.innerText = `${input.value.length}/10`;
+        }
+
+        function loop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            drawBackground();
+            drawPipes();
+            drawBird();
+
+            if (!isPaused && !gameOver) {
+                updateBird();
+                updatePipes();
+                frameCount++;
+            }
+
+            if (currentScreen === 'game') {
+                animationFrameId = requestAnimationFrame(loop);
+            }
+        }
+
+        // Control listeners
+        window.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                triggerJump();
+            }
+        });
+
+        canvas.addEventListener('click', () => {
+            triggerJump();
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            triggerJump();
+        }, { passive: false });
+
+        function togglePause() {
+            if (currentScreen === 'game') {
+                isPaused = true;
+                document.getElementById('screen-pause').classList.remove('hidden');
+                currentScreen = 'pause';
+            } else if (currentScreen === 'pause') {
+                isPaused = false;
+                document.getElementById('screen-pause').classList.add('hidden');
+                currentScreen = 'game';
+                loop();
+            }
+        }
+
+        function restartGame() {
+            document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-pause').classList.add('hidden');
+            currentScreen = 'game';
+            isPaused = false;
+            initGameSession();
+        }
+
+        function returnToMenu() {
+            document.getElementById('screen-gameover').classList.add('hidden');
+            document.getElementById('screen-pause').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('screen-select').classList.remove('hidden');
+            currentScreen = 'select';
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        }
+
+        function getLeaderboard() {
+            try {
+                const data = localStorage.getItem('flappy_hero_leaderboard');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveLeaderboard(board) {
+            try {
+                localStorage.setItem('flappy_hero_leaderboard', JSON.stringify(board));
+            } catch (e) {}
+        }
+
+        function submitScore() {
+            const nameInput = document.getElementById('player-name');
+            const errorMsg = document.getElementById('error-msg');
+            const name = nameInput.value.trim();
+
+            if (name.length === 0 || name.length > 10) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+            errorMsg.classList.add('hidden');
+
+            let leaderboard = getLeaderboard();
+            leaderboard.push({
+                name: name,
+                score: score,
+                character: characters[selectedChar].name,
+                date: new Date().toLocaleDateString()
+            });
+
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 10);
+
+            saveLeaderboard(leaderboard);
+
+            document.getElementById('score-submit-box').classList.add('hidden');
+            document.getElementById('score-submitted-msg').classList.remove('hidden');
+        }
+
+        function showLeaderboardFromMenu() {
+            renderLeaderboardList();
+            document.getElementById('screen-leaderboard').classList.remove('hidden');
+            currentScreen = 'leaderboard';
+        }
+
+        function closeLeaderboard() {
+            document.getElementById('screen-leaderboard').classList.add('hidden');
+            if (currentScreen === 'leaderboard') {
+                currentScreen = 'select';
+            }
+        }
+
+        function renderLeaderboardList() {
+            const listEl = document.getElementById('leaderboard-list');
+            const leaderboard = getLeaderboard();
+
+            if (leaderboard.length === 0) {
+                listEl.innerHTML = `<div class="text-center text-slate-500 py-10">尚無排行榜紀錄，快來挑戰第一名！</div>`;
+                return;
+            }
+
+            let html = '';
+            leaderboard.forEach((entry, idx) => {
+                let badgeColor = 'text-slate-400 border-slate-700 bg-slate-900';
+                if (idx === 0) badgeColor = 'text-amber-300 border-amber-500 bg-amber-950/40';
+                else if (idx === 1) badgeColor = 'text-slate-200 border-slate-400 bg-slate-800/40';
+                else if (idx === 2) badgeColor = 'text-amber-600 border-amber-700 bg-amber-950/20';
+
+                html += `
+                    <div class="flex items-center justify-between p-3 rounded-xl border ${badgeColor}">
+                        <div class="flex items-center gap-3 truncate pr-2">
+                            <span class="arcade-font text-sm font-bold w-6 text-center flex-shrink-0">#${idx + 1}</span>
+                            <div class="truncate">
+                                <div class="font-bold text-white tracking-wider truncate">${entry.name}</div>
+                                <div class="text-xs text-slate-400">英雄: ${entry.character}</div>
+                            </div>
+                        </div>
+                        <div class="arcade-font text-amber-400 text-lg flex-shrink-0">${entry.score}</div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
