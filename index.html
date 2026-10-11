@@ -27,10 +27,10 @@
     }
   });
 </script>
-    
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Flappy Hero - 英雄大冒險</title>
+  <title>Flappy Hero - 英雄飛揚大冒險</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@700;900&display=swap');
@@ -152,7 +152,7 @@
           <span id="finalScore" class="pixel-font text-5xl text-amber-400">0</span>
         </div>
 
-        <!-- 名字輸入區域 (居中排版) -->
+        <!-- 名字輸入區域 -->
         <div class="w-full space-y-2">
           <label class="text-xs text-slate-300 font-bold block">輸入名稱登錄英雄榜</label>
           <div class="relative w-full">
@@ -163,7 +163,7 @@
           </div>
         </div>
 
-        <!-- 確認送出按鈕（位於輸入框正下方） -->
+        <!-- 確認送出按鈕 -->
         <button onclick="submitScore()" id="submitBtn" class="w-full py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-sm rounded-xl shadow-lg transition active:scale-95">
           提交成績並查看排行
         </button>
@@ -174,27 +174,27 @@
       </div>
     </div>
 
-    <!-- UI 層：排行榜 Modal -->
-    <div id="leaderboardModal" class="relative z-30 hidden inset-0 flex items-center justify-center p-6 bg-slate-950/90 backdrop-blur-md">
-      <div class="w-full max-h-[85%] bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 shadow-2xl flex flex-col">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-black text-amber-400 flex items-center gap-2">
+    <!-- UI 層：排行榜 Modal (修復高度與展開) -->
+    <div id="leaderboardModal" class="absolute inset-0 z-30 hidden flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
+      <div class="w-full max-w-xs h-[520px] bg-slate-900 border-2 border-slate-700 rounded-3xl p-5 shadow-2xl flex flex-col justify-between">
+        <div class="flex justify-between items-center pb-3 border-b border-slate-800">
+          <h3 class="text-base font-black text-amber-400 flex items-center gap-2">
             <span>🏆</span> 全球英雄榜
           </h3>
-          <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-white text-xl">✕</button>
+          <button onclick="closeLeaderboard()" class="text-slate-400 hover:text-white text-lg px-2">✕</button>
         </div>
 
         <!-- 載入中動畫 -->
-        <div id="loadingLeaderboard" class="py-8 text-center text-xs text-slate-400 animate-pulse">
+        <div id="loadingLeaderboard" class="my-auto text-center text-xs text-slate-400 animate-pulse">
           正從雲端載入最新排行榜...
         </div>
 
-        <!-- 排行榜列表 -->
-        <div id="leaderboardList" class="flex-1 overflow-y-auto space-y-2 pr-1 no-scrollbar hidden">
+        <!-- 排行榜列表 (設定固定高度與捲動) -->
+        <div id="leaderboardList" class="flex-1 overflow-y-auto my-3 space-y-2 pr-1 no-scrollbar hidden">
           <!-- JS 動態渲染 -->
         </div>
 
-        <button onclick="closeLeaderboard()" class="mt-4 w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-600">
+        <button onclick="closeLeaderboard()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl border border-slate-600">
           關閉
         </button>
       </div>
@@ -211,7 +211,6 @@
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // 遊戲狀態
     let gameState = 'MENU'; // 'MENU', 'PLAYING', 'GAMEOVER'
     let selectedChar = null;
     let score = 0;
@@ -261,7 +260,6 @@
       document.getElementById('soundBtn').innerText = soundEnabled ? '🔊' : '🔇';
     }
 
-    // 角色屬性與主題
     const CHARACTERS = {
       wukong: {
         name: '孫悟空',
@@ -286,27 +284,24 @@
       }
     };
 
-    // 物理引擎調整（極極極致浮飄超慢下跌）
     const bird = {
       x: 80,
       y: 300,
       radius: 20,
       velocity: 0,
-      gravity: 0.08,    // 極低重力，慢速滑翔
-      jump: -3.2,       // 輕盈柔和微跳
+      gravity: 0.08,
+      jump: -3.2,
       rotation: 0
     };
 
-    // 柱子/障礙物設定（柱子幼一半、間距加寬）
     let pipes = [];
     const pipeConfig = {
-      width: 28,        // 寬度減半 (56 -> 28)
-      gap: 200,         // 上下開口極度寬敞
-      spawnRate: 150,   // 水平距離加寬 15%
-      speed: 1.4        // 速度放慢 20%
+      width: 28,
+      gap: 200,
+      spawnRate: 150,
+      speed: 1.4
     };
 
-    // 初始化與事件監聽
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Space') handleJump();
     });
@@ -319,7 +314,6 @@
       if (gameState === 'PLAYING') {
         bird.velocity = bird.jump;
         playSound('jump');
-        // 產生跳躍特效粒子
         for (let i = 0; i < 6; i++) {
           particles.push({
             x: bird.x - 10,
@@ -359,7 +353,6 @@
       document.getElementById('charCounter').innerText = `${input.value.length}/10`;
     }
 
-    // 初始化背景裝飾粒子（沙漠塵埃/都市星光/太空星系）
     function initBgParticles() {
       bgParticles = [];
       const count = selectedChar === 'space' ? 60 : 30;
@@ -374,7 +367,6 @@
       }
     }
 
-    // 遊戲主要邏輯循環
     function gameLoop() {
       if (gameState !== 'PLAYING') return;
 
@@ -389,12 +381,10 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // 繪製背景
     function drawBackground() {
       const bgType = CHARACTERS[selectedChar].bgType;
 
       if (bgType === 'desert') {
-        // 沙漠背景
         const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, '#7c2d12');
         grad.addColorStop(0.6, '#c2410c');
@@ -402,14 +392,12 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 太陽
         ctx.fillStyle = '#fef08a';
         ctx.beginPath();
         ctx.arc(300, 120, 40, 0, Math.PI * 2);
         ctx.fill();
 
       } else if (bgType === 'city') {
-        // 都市夜景背景
         const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, '#0f172a');
         grad.addColorStop(0.7, '#581c87');
@@ -417,7 +405,6 @@
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // 建築輪廓
         ctx.fillStyle = '#1e1b4b';
         ctx.fillRect(20, 480, 50, 200);
         ctx.fillRect(80, 420, 70, 260);
@@ -425,7 +412,6 @@
         ctx.fillRect(260, 450, 80, 230);
 
       } else if (bgType === 'space') {
-        // 太空背景
         const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, '#020617');
         grad.addColorStop(0.8, '#090d16');
@@ -434,7 +420,6 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      // 動態背景星光/微粒
       ctx.fillStyle = '#ffffff';
       bgParticles.forEach(p => {
         p.x -= p.speed;
@@ -447,15 +432,12 @@
       ctx.globalAlpha = 1.0;
     }
 
-    // 小鳥更新與繪製（含發光 Effect）
     function updateAndDrawBird() {
       bird.velocity += bird.gravity;
       bird.y += bird.velocity;
 
-      // 旋轉平滑傾斜
       bird.rotation = Math.min(Math.PI / 6, Math.max(-Math.PI / 8, bird.velocity * 0.08));
 
-      // 碰撞天花板與地面
       if (bird.y + bird.radius >= canvas.height - 20 || bird.y - bird.radius <= 0) {
         triggerGameOver();
         return;
@@ -465,7 +447,6 @@
       ctx.translate(bird.x, bird.y);
       ctx.rotate(bird.rotation);
 
-      // 繪製發光 Aura
       const charInfo = CHARACTERS[selectedChar];
       const glowGrad = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 1.8);
       glowGrad.addColorStop(0, charInfo.glowColor);
@@ -476,7 +457,6 @@
       ctx.arc(0, 0, bird.radius * 2, 0, Math.PI * 2);
       ctx.fill();
 
-      // 繪製角色 Icon Emoji
       ctx.font = '32px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -485,7 +465,6 @@
       ctx.restore();
     }
 
-    // 管道障礙物 logic
     function updateAndDrawPipes() {
       if (frameCount % pipeConfig.spawnRate === 0) {
         const minTop = 60;
@@ -501,7 +480,6 @@
       pipes.forEach((pipe, index) => {
         pipe.x -= pipeConfig.speed;
 
-        // 管道顏色搭配背景
         let pipeColor = '#10b981';
         let capColor = '#059669';
 
@@ -513,13 +491,11 @@
           pipeColor = '#06b6d4'; capColor = '#0891b2';
         }
 
-        // 上管道
         ctx.fillStyle = pipeColor;
         ctx.fillRect(pipe.x, 0, pipeConfig.width, pipe.top);
         ctx.fillStyle = capColor;
         ctx.fillRect(pipe.x - 3, pipe.top - 12, pipeConfig.width + 6, 12);
 
-        // 下管道
         const bottomY = pipe.top + pipeConfig.gap;
         const bottomHeight = canvas.height - bottomY;
         ctx.fillStyle = pipeColor;
@@ -527,7 +503,6 @@
         ctx.fillStyle = capColor;
         ctx.fillRect(pipe.x - 3, bottomY, pipeConfig.width + 6, 12);
 
-        // 碰撞偵測
         if (
           bird.x + bird.radius - 4 > pipe.x &&
           bird.x - bird.radius + 4 < pipe.x + pipeConfig.width &&
@@ -536,7 +511,6 @@
           triggerGameOver();
         }
 
-        // 加分計數
         if (!pipe.passed && pipe.x + pipeConfig.width < bird.x) {
           pipe.passed = true;
           score++;
@@ -545,11 +519,9 @@
         }
       });
 
-      // 移除畫面外管道
       pipes = pipes.filter(p => p.x + pipeConfig.width > -20);
     }
 
-    // 尾跡粒子系統
     function updateAndDrawParticles() {
       particles.forEach((p, index) => {
         p.x += p.vx;
@@ -569,7 +541,6 @@
       ctx.globalAlpha = 1.0;
     }
 
-    // 觸發遊戲結束
     function triggerGameOver() {
       gameState = 'GAMEOVER';
       playSound('hit');
@@ -584,7 +555,6 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // 提交成績至 Google 試算表 (Google Apps Script)
     function submitScore() {
       const nameInput = document.getElementById('playerNameInput');
       const name = nameInput.value.trim() || '無名英雄';
@@ -609,7 +579,6 @@
         }, 800);
       })
       .catch(err => {
-        alert('連線失敗，將優先顯示本地紀錄');
         document.getElementById('gameOverModal').classList.add('hidden');
         openLeaderboard();
         btn.disabled = false;
@@ -617,7 +586,6 @@
       });
     }
 
-    // 打開排行榜 Modal，向 Google Apps Script 抓取前 10 名
     function openLeaderboard() {
       const modal = document.getElementById('leaderboardModal');
       const loading = document.getElementById('loadingLeaderboard');
@@ -635,7 +603,7 @@
           list.classList.remove('hidden');
 
           if (!data || data.length === 0) {
-            list.innerHTML = '<div class="text-center text-slate-500 py-4 text-xs">目前還沒有玩家登錄紀錄</div>';
+            list.innerHTML = '<div class="text-center text-slate-500 py-6 text-xs">目前還沒有玩家登錄紀錄</div>';
             return;
           }
 
@@ -646,11 +614,11 @@
             if (index === 2) rankBadge = `<span class="w-6 h-6 rounded-full bg-amber-700 text-white flex items-center justify-center text-xs font-black">3</span>`;
 
             const row = document.createElement('div');
-            row.className = 'flex items-center justify-between p-3 bg-slate-950/60 rounded-xl border border-slate-800';
+            row.className = 'flex items-center justify-between p-2.5 bg-slate-950/60 rounded-xl border border-slate-800';
             row.innerHTML = `
-              <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2.5">
                 ${rankBadge}
-                <span class="font-bold text-sm text-slate-200 truncate max-w-[140px]">${escapeHtml(item.name)}</span>
+                <span class="font-bold text-sm text-slate-200 truncate max-w-[130px]">${escapeHtml(item.name)}</span>
               </div>
               <span class="pixel-font text-amber-400 text-sm">${item.score}</span>
             `;
@@ -658,7 +626,9 @@
           });
         })
         .catch(err => {
-          loading.innerText = '讀取排行榜失敗，請重新嘗試';
+          loading.classList.add('hidden');
+          list.classList.remove('hidden');
+          list.innerHTML = '<div class="text-center text-red-400 py-6 text-xs">讀取排行榜失敗，請檢查網路</div>';
         });
     }
 
