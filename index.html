@@ -1,5 +1,7 @@
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+
 
 <meta name="robots" content="noindex, nofollow, noai, noimageai">
 <meta name="googlebot" content="noindex, nofollow, noai">
@@ -28,6 +30,7 @@
   });
 </script>
 
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Flappy Hero - 英雄飛揚大冒險</title>
@@ -46,7 +49,7 @@
       font-family: 'Press Start 2P', cursive, sans-serif;
     }
 
-    /* 光暈與粒子特效 */
+    /* 光暈與特效動畫 */
     @keyframes wukongGlow {
       0%, 100% { filter: drop-shadow(0 0 10px #ff9900) drop-shadow(0 0 20px #ff3300); transform: scale(1); }
       50% { filter: drop-shadow(0 0 18px #ffcc00) drop-shadow(0 0 30px #ff6600); transform: scale(1.05); }
@@ -85,7 +88,7 @@
         <h1 class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-pink-500 to-cyan-400 drop-shadow-md">
           FLAPPY HEROES
         </h1>
-        <p class="text-xs text-slate-300 mt-2 tracking-widest uppercase">選擇你的英雄開啟冒險</p>
+        <p class="text-xs text-slate-300 mt-2 tracking-widest uppercase">選擇你的角色開啟冒險</p>
       </div>
 
       <!-- 角色卡片列表 -->
@@ -117,10 +120,10 @@
 
         <!-- 外星人 -->
         <button onclick="selectCharacter('alien')" class="group relative w-full p-3.5 bg-gradient-to-r from-cyan-950/80 to-slate-900/80 border-2 border-cyan-500/50 hover:border-cyan-400 rounded-2xl flex items-center gap-4 transition-all hover:scale-[1.02] active:scale-95 shadow-lg">
-          <div class="text-4xl glow-alien group-hover:scale-110 transition-transform">👽</div>
+          <div class="text-4xl glow-alien group-hover:scale-110 transition-transform">🛸</div>
           <div class="text-left flex-1">
             <div class="flex items-center justify-between">
-              <span class="font-bold text-cyan-300 text-lg">外星人</span>
+              <span class="font-bold text-cyan-300 text-lg">外星人 (飛船)</span>
               <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">霓虹星能</span>
             </div>
             <p class="text-xs text-cyan-200/70 mt-0.5">背景：浩瀚璀璨深太空</p>
@@ -174,7 +177,7 @@
       </div>
     </div>
 
-    <!-- UI 層：排行榜 Modal (修復高度與展開) -->
+    <!-- UI 層：排行榜 Modal -->
     <div id="leaderboardModal" class="absolute inset-0 z-30 hidden flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md">
       <div class="w-full max-w-xs h-[520px] bg-slate-900 border-2 border-slate-700 rounded-3xl p-5 shadow-2xl flex flex-col justify-between">
         <div class="flex justify-between items-center pb-3 border-b border-slate-800">
@@ -189,7 +192,7 @@
           正從雲端載入最新排行榜...
         </div>
 
-        <!-- 排行榜列表 (設定固定高度與捲動) -->
+        <!-- 排行榜列表 -->
         <div id="leaderboardList" class="flex-1 overflow-y-auto my-3 space-y-2 pr-1 no-scrollbar hidden">
           <!-- JS 動態渲染 -->
         </div>
@@ -263,21 +266,18 @@
     const CHARACTERS = {
       wukong: {
         name: '孫悟空',
-        icon: '🐒',
         glowColor: '#ff9900',
         particleColor: ['#ffcc00', '#ff6600', '#ff3300'],
         bgType: 'desert'
       },
       sailor: {
         name: '美少女戰士',
-        icon: '💖',
         glowColor: '#ff66cc',
         particleColor: ['#ff99ff', '#ff3399', '#ffffff'],
         bgType: 'city'
       },
       alien: {
         name: '外星人',
-        icon: '👽',
         glowColor: '#00ffcc',
         particleColor: ['#33ffff', '#00ff66', '#a855f7'],
         bgType: 'space'
@@ -299,7 +299,7 @@
       width: 28,
       gap: 200,
       spawnRate: 150,
-      speed: 1.4
+      baseSpeed: 1.4
     };
 
     window.addEventListener('keydown', (e) => {
@@ -432,11 +432,13 @@
       ctx.globalAlpha = 1.0;
     }
 
+    // 全身像素角色繪製（前傾衝刺飛行姿態 / UFO飛船）
     function updateAndDrawBird() {
       bird.velocity += bird.gravity;
       bird.y += bird.velocity;
 
-      bird.rotation = Math.min(Math.PI / 6, Math.max(-Math.PI / 8, bird.velocity * 0.08));
+      // 飛行傾斜角度隨速度增加
+      bird.rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 6, bird.velocity * 0.1));
 
       if (bird.y + bird.radius >= canvas.height - 20 || bird.y - bird.radius <= 0) {
         triggerGameOver();
@@ -448,24 +450,50 @@
       ctx.rotate(bird.rotation);
 
       const charInfo = CHARACTERS[selectedChar];
-      const glowGrad = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 1.8);
+      const glowGrad = ctx.createRadialGradient(0, 0, bird.radius * 0.5, 0, 0, bird.radius * 2);
       glowGrad.addColorStop(0, charInfo.glowColor);
       glowGrad.addColorStop(1, 'transparent');
       
       ctx.fillStyle = glowGrad;
       ctx.beginPath();
-      ctx.arc(0, 0, bird.radius * 2, 0, Math.PI * 2);
+      ctx.arc(0, 0, bird.radius * 2.2, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.font = '32px sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(charInfo.icon, 0, 0);
+      // 依角色繪製精細全身與飛行姿態
+      if (selectedChar === 'wukong') {
+        // 孫悟空：頭戴金箍、紅色披風、身體前傾衝刺
+        ctx.fillStyle = '#dc2626'; ctx.fillRect(-18, -4, 16, 10);   // 身後飄揚披風
+        ctx.fillStyle = '#b45309'; ctx.fillRect(-10, -6, 20, 14);  // 身體護甲
+        ctx.fillStyle = '#f59e0b'; ctx.fillRect(2, -14, 16, 14);   // 頭部臉龐
+        ctx.fillStyle = '#fbbf24'; ctx.fillRect(0, -18, 20, 4);    // 金箍咒
+        ctx.fillStyle = '#78350f'; ctx.fillRect(10, -10, 4, 4);    // 眼睛
+        ctx.fillStyle = '#ea580c'; ctx.fillRect(-12, 6, 8, 4);     // 前伸金箍棒
+      } else if (selectedChar === 'sailor') {
+        // 美少女戰士：金髮雙馬尾向後飄、水手服、優雅前傾
+        ctx.fillStyle = '#fde047'; ctx.fillRect(-22, -12, 14, 8);  // 飄逸金色雙馬尾
+        ctx.fillStyle = '#ec4899'; ctx.fillRect(-10, -4, 18, 12);  // 水手服身體
+        ctx.fillStyle = '#fbcfe8'; ctx.fillRect(2, -14, 15, 14);   // 臉部
+        ctx.fillStyle = '#f43f5e'; ctx.fillRect(8, -18, 6, 4);     // 頭飾水晶
+        ctx.fillStyle = '#831843'; ctx.fillRect(10, -10, 4, 4);    // 眼睛
+      } else if (selectedChar === 'alien') {
+        // 外星人：坐在圓盤幽浮飛船 (UFO) 內
+        ctx.fillStyle = '#38bdf8'; 
+        ctx.beginPath(); ctx.arc(0, -6, 10, Math.PI, 0, false); ctx.fill(); // 透明玻璃罩
+        ctx.fillStyle = '#06b6d4'; ctx.fillRect(-20, 2, 40, 8);   // UFO 金屬圓盤機身
+        ctx.fillStyle = '#34d399'; ctx.fillRect(-2, -12, 4, 6);    // 外星人頭頂天線
+        ctx.fillStyle = '#020617'; ctx.fillRect(-4, -8, 8, 6);     // 外星人大眼
+        ctx.fillStyle = '#a855f7'; 
+        ctx.beginPath(); ctx.ellipse(0, 10, 14, 4, 0, 0, Math.PI * 2); ctx.fill(); // 底部噴射光環
+      }
 
       ctx.restore();
     }
 
+    // 每 10 分加速 5% 的流暢難度成長機制
     function updateAndDrawPipes() {
+      // 速度計算公式：基礎速度 * (1 + 每10分增加 5%)
+      const currentSpeed = pipeConfig.baseSpeed * Math.pow(1.05, Math.floor(score / 10));
+
       if (frameCount % pipeConfig.spawnRate === 0) {
         const minTop = 60;
         const maxTop = canvas.height - pipeConfig.gap - 100;
@@ -478,7 +506,7 @@
       }
 
       pipes.forEach((pipe, index) => {
-        pipe.x -= pipeConfig.speed;
+        pipe.x -= currentSpeed;
 
         let pipeColor = '#10b981';
         let capColor = '#059669';
@@ -557,7 +585,7 @@
 
     function submitScore() {
       const nameInput = document.getElementById('playerNameInput');
-      const name = nameInput.value.trim() || '無名英雄';
+      const name = nameInput.value.trim() || 'no name';
       const btn = document.getElementById('submitBtn');
 
       btn.disabled = true;
